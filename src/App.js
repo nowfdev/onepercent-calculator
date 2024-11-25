@@ -1,7 +1,9 @@
 import "./styles.css";
 import { useReducer } from "react";
+import DigitButton from "./DigitButton";
+import OperationButton from "./OperationButton";
 
-const ACTIONS = {
+export const ACTIONS = {
   ADD_DIGIT: "add-digit",
   CHOOSE_OPERATION: "choose-operation",
   CLEAR: "clear",
@@ -24,7 +26,7 @@ function App() {
     reducer,
     {}
   );
-  dispatch({ type: ACTIONS.ADD_DIGIT, payload: { digit: 1 } });
+
   return (
     <div className="calculator-grid">
       <div className="output">
@@ -33,25 +35,26 @@ function App() {
         </div>
         <div className="current-input">{currentInput}</div>
       </div>
+
       <button>AC</button>
-      <button>+/-</button>
-      <button>%</button>
-      <button>/</button>
-      <button>7</button>
-      <button>8</button>
-      <button>9</button>
-      <button>X</button>
-      <button>4</button>
-      <button>5</button>
-      <button>6</button>
-      <button>-</button>
-      <button>1</button>
-      <button>2</button>
-      <button>3</button>
-      <button>+</button>
-      <button className="span-two">0</button>
-      <button>,</button>
-      <button>=</button>
+      <OperationButton operation="+/-" dispatch={dispatch}></OperationButton>
+      <OperationButton operation="%" dispatch={dispatch}></OperationButton>
+      <OperationButton operation="/" dispatch={dispatch}></OperationButton>
+      <DigitButton digit="7" dispatch={dispatch}></DigitButton>
+      <DigitButton digit="8" dispatch={dispatch}></DigitButton>
+      <DigitButton digit="9" dispatch={dispatch}></DigitButton>
+      <OperationButton operation="*" dispatch={dispatch}></OperationButton>
+      <DigitButton digit="4" dispatch={dispatch}></DigitButton>
+      <DigitButton digit="5" dispatch={dispatch}></DigitButton>
+      <DigitButton digit="6" dispatch={dispatch}></DigitButton>
+      <OperationButton operation="-" dispatch={dispatch}></OperationButton>
+      <DigitButton digit="1" dispatch={dispatch}></DigitButton>
+      <DigitButton digit="2" dispatch={dispatch}></DigitButton>
+      <DigitButton digit="3" dispatch={dispatch}></DigitButton>
+      <OperationButton operation="+" dispatch={dispatch}></OperationButton>
+      <DigitButton digit="0" dispatch={dispatch}></DigitButton>
+      <DigitButton digit="," dispatch={dispatch}></DigitButton>
+      <button className="span-two">=</button>
     </div>
   );
 }
