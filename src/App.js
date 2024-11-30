@@ -70,8 +70,8 @@ function reducer(state, { type, payload }) {
         operation: null,
         currentInput: evaluate(state),
       };
-
     default:
+      throw new Error("Invalid action");
   }
 }
 
@@ -95,7 +95,11 @@ function evaluate({ currentInput, previousInput, operation }) {
     case "/":
       computation = prev / curr;
       break;
+    case "%":
+      computation = currentInput / 100;
+      break;
     default:
+      throw new Error("Invalid action");
   }
   return computation.toString();
 }
