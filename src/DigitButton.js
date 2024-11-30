@@ -1,4 +1,3 @@
-import { type } from "@testing-library/user-event/dist/type";
 import { ACTIONS } from "./App";
 
 export default function DigitButton({ dispatch, digit }) {
