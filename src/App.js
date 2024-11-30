@@ -14,13 +14,92 @@ export const ACTIONS = {
 function reducer(state, { type, payload }) {
   switch (type) {
     case ACTIONS.ADD_DIGIT:
+      if (state.overwrite) {
+        return {
+          ...state,
+          currentInput: payload.digit,
+          overwrite: false,
+        };
+      }
+      if (payload.digit === "0" && state.currentInput === "0") return state;
+      if (payload.digit === "," && state.currentInput.includes(","))
+        return state;
       return {
         ...state,
         currentInput: `${state.currentInput || ""}${payload.digit}`,
       };
+    case ACTIONS.CHOOSE_OPERATION:
+      if (state.currentInput == null && state.previousInput == null)
+        return state;
+
+      if (state.currentInput == null) {
+        return {
+          ...state,
+          operation: payload.operation,
+        };
+      }
+      if (state.previousInput == null) {
+        return {
+          ...state,
+          operation: payload.operation,
+          previousInput: state.currentInput,
+          currentInput: null,
+        };
+      }
+
+      return {
+        ...state,
+        previousInput: evaluate(state),
+        operation: payload.operation,
+        currentInput: null,
+      };
+    case ACTIONS.CLEAR:
+      return {};
+    case ACTIONS.EVALUATE:
+      if (
+        state.currentInput == null ||
+        state.previousInput == null ||
+        state.operation == null
+      ) {
+        return state;
+      }
+      return {
+        ...state,
+        previousInput: null,
+        overwrite: true,
+        operation: null,
+        currentInput: evaluate(state),
+      };
+
     default:
   }
 }
+
+function evaluate({ currentInput, previousInput, operation }) {
+  const prev = parseFloat(previousInput);
+  const curr = parseFloat(currentInput);
+
+  if (isNaN(prev) || isNaN(curr)) return "";
+
+  let computation = "";
+  switch (operation) {
+    case "+":
+      computation = prev + curr;
+      break;
+    case "-":
+      computation = prev - curr;
+      break;
+    case "*":
+      computation = prev * curr;
+      break;
+    case "/":
+      computation = prev / curr;
+      break;
+    default:
+  }
+  return computation.toString();
+}
+
 function App() {
   const [{ currentInput, previousInput, operation }, dispatch] = useReducer(
     reducer,
@@ -36,7 +115,7 @@ function App() {
         <div className="current-input">{currentInput}</div>
       </div>
 
-      <button>AC</button>
+      <button onClick={() => dispatch({ type: ACTIONS.CLEAR })}>AC</button>
       <OperationButton operation="+/-" dispatch={dispatch}></OperationButton>
       <OperationButton operation="%" dispatch={dispatch}></OperationButton>
       <OperationButton operation="/" dispatch={dispatch}></OperationButton>
@@ -54,7 +133,12 @@ function App() {
       <OperationButton operation="+" dispatch={dispatch}></OperationButton>
       <DigitButton digit="0" dispatch={dispatch}></DigitButton>
       <DigitButton digit="," dispatch={dispatch}></DigitButton>
-      <button className="span-two">=</button>
+      <button
+        className="span-two"
+        onClick={() => dispatch({ type: ACTIONS.EVALUATE })}
+      >
+        =
+      </button>
     </div>
   );
 }
