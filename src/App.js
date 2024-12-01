@@ -2,10 +2,12 @@ import "./styles.css";
 import { useReducer } from "react";
 import DigitButton from "./DigitButton";
 import OperationButton from "./OperationButton";
+import SpecialButton from "./SpecialButton";
 
 export const ACTIONS = {
   ADD_DIGIT: "add-digit",
   CHOOSE_OPERATION: "choose-operation",
+  CHOOSE_SPECIAL_FUNC: "choose-special-function",
   CLEAR: "clear",
   DELETE: "delete-digit",
   EVALUATE: "evaluate",
@@ -38,6 +40,13 @@ function reducer(state, { type, payload }) {
           operation: payload.operation,
         };
       }
+
+      if (state.currentInput != null && payload.operation === "+/-") {
+        return {
+          ...state,
+          previousInput: evaluate(state),
+        };
+      }
       if (state.previousInput == null) {
         return {
           ...state,
@@ -53,8 +62,13 @@ function reducer(state, { type, payload }) {
         operation: payload.operation,
         currentInput: null,
       };
-    case ACTIONS.CLEAR:
-      return {};
+    case ACTIONS.CHOOSE_SPECIAL_FUNC:
+      if (state.currentInput == null) return state;
+
+      return {
+        ...state,
+        currentInput: evaluate(state),
+      };
     case ACTIONS.EVALUATE:
       if (
         state.currentInput == null ||
@@ -70,6 +84,8 @@ function reducer(state, { type, payload }) {
         operation: null,
         currentInput: evaluate(state),
       };
+    case ACTIONS.CLEAR:
+      return {};
     default:
       throw new Error("Invalid action");
   }
@@ -95,13 +111,33 @@ function evaluate({ currentInput, previousInput, operation }) {
     case "/":
       computation = prev / curr;
       break;
-    case "%":
-      computation = currentInput / 100;
+    case "+/-":
+      computation = -Math.abs(curr);
+
       break;
     default:
       throw new Error("Invalid action");
   }
+  console.log(computation);
   return computation.toString();
+}
+
+function handlerSpecialCase({ currentInput, operation }) {
+  const curr = currentInput;
+  let rs = "";
+  if (isNaN(curr)) return "";
+  switch (operation) {
+    case "+/-":
+      if (curr < 0) {
+        rs = Math.abs(curr);
+      } else {
+        rs = curr * -1;
+      }
+      break;
+    default:
+      throw new Error("SPECIAL FAIL");
+  }
+  return rs.toString();
 }
 
 function App() {
