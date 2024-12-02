@@ -2,6 +2,7 @@ import "./styles.css";
 import { useReducer } from "react";
 import DigitButton from "./DigitButton";
 import OperationButton from "./OperationButton";
+import SpecialButton from "./SpecialButton";
 
 export const ACTIONS = {
   ADD_DIGIT: "add-digit",
@@ -48,12 +49,21 @@ function reducer(state, { type, payload }) {
           currentInput: null,
         };
       }
-
       return {
         ...state,
         previousInput: evaluate(state),
         operation: payload.operation,
         currentInput: null,
+      };
+    case ACTIONS.CHOOSE_SPECIAL_FUNC:
+      if (state.currentInput == null) return state;
+      return {
+        ...state,
+        // operation: null,
+        currentInput: handlerSpecialCalculationMethod(
+          state.currentInput,
+          payload.operation
+        ),
       };
     case ACTIONS.EVALUATE:
       if (
@@ -103,6 +113,28 @@ function evaluate({ currentInput, previousInput, operation }) {
   console.log(computation);
   return computation.toString();
 }
+
+function handlerSpecialCalculationMethod(number, operation) {
+  let rs = "";
+  const num = parseFloat(number);
+  if (isNaN(num)) return "";
+  switch (operation) {
+    case "+/-":
+      if (num < 0) {
+        rs = Math.abs(num);
+      } else {
+        rs = -Math.abs(num);
+      }
+      break;
+    case "%":
+      rs = num / 100;
+      break;
+    default:
+      throw new Error();
+  }
+  return rs.toString();
+}
+
 function App() {
   const [{ currentInput, previousInput, operation }, dispatch] = useReducer(
     reducer,
@@ -119,8 +151,8 @@ function App() {
       </div>
 
       <button onClick={() => dispatch({ type: ACTIONS.CLEAR })}>AC</button>
-      <OperationButton operation="+/-" dispatch={dispatch}></OperationButton>
-      <OperationButton operation="%" dispatch={dispatch}></OperationButton>
+      <SpecialButton operation="+/-" dispatch={dispatch}></SpecialButton>
+      <SpecialButton operation="%" dispatch={dispatch}></SpecialButton>
       <OperationButton operation="/" dispatch={dispatch}></OperationButton>
       <DigitButton digit="7" dispatch={dispatch}></DigitButton>
       <DigitButton digit="8" dispatch={dispatch}></DigitButton>
