@@ -24,7 +24,7 @@ function reducer(state, { type, payload }) {
         };
       }
       if (payload.digit === "0" && state.currentInput === "0") return state;
-      if (payload.digit === "," && state.currentInput.includes(","))
+      if (payload.digit === "." && state.currentInput.includes("."))
         return state;
       return {
         ...state,
@@ -79,6 +79,12 @@ function reducer(state, { type, payload }) {
         overwrite: true,
         operation: null,
         currentInput: evaluate(state),
+      };
+    case ACTIONS.DELETE:
+      if (state.currentInput == null) return state;
+      return {
+        ...state,
+        currentInput: null,
       };
     case ACTIONS.CLEAR:
       return {};
@@ -141,6 +147,8 @@ function App() {
     {}
   );
 
+  const buttonLabel = currentInput ? "DEL" : "AC";
+
   return (
     <div className="calculator-grid">
       <div className="output">
@@ -150,7 +158,13 @@ function App() {
         <div className="current-input">{currentInput}</div>
       </div>
 
-      <button onClick={() => dispatch({ type: ACTIONS.CLEAR })}>AC</button>
+      <button
+        onClick={() =>
+          dispatch({ type: currentInput ? ACTIONS.DELETE : ACTIONS.CLEAR })
+        }
+      >
+        {buttonLabel}
+      </button>
       <SpecialButton operation="+/-" dispatch={dispatch}></SpecialButton>
       <SpecialButton operation="%" dispatch={dispatch}></SpecialButton>
       <OperationButton operation="/" dispatch={dispatch}></OperationButton>
@@ -167,7 +181,7 @@ function App() {
       <DigitButton digit="3" dispatch={dispatch}></DigitButton>
       <OperationButton operation="+" dispatch={dispatch}></OperationButton>
       <DigitButton digit="0" dispatch={dispatch}></DigitButton>
-      <DigitButton digit="," dispatch={dispatch}></DigitButton>
+      <DigitButton digit="." dispatch={dispatch}></DigitButton>
       <button
         className="span-two"
         onClick={() => dispatch({ type: ACTIONS.EVALUATE })}
